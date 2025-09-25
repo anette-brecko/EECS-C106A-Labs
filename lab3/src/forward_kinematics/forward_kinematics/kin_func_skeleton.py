@@ -15,7 +15,7 @@ code by running "python kin_func_skeleton.py at the command line.
 """
 
 import numpy as np
-import scipy as sp
+from scipy import linalg as sp
 
 np.set_printoptions(precision=4,suppress=True)
 
@@ -117,6 +117,8 @@ def skew_3d(omega):
     skew[2, 1] = omega[0]
     return skew
 
+
+
 def rotation_3d(omega, theta):
     """
     Computes a 3D rotation matrix given a rotation axis and angle of rotation.
@@ -132,13 +134,14 @@ def rotation_3d(omega, theta):
     # YOUR CODE HERE
 
     rot = np.zeros((3,3))
-
-    # Use Rodrigues formula
-
+    norm = np.linalg.norm(omega)
+    omega_hat = skew_3d(omega)
+    rot = np.eye(3) + ((omega_hat/norm) * np.sin(norm * theta)) 
+    rot = rot + (((omega_hat @ omega_hat)/(norm * norm)) * (1 - np.cos(norm * theta)))
     return rot
 
 
-    
+
 def hat_3d(xi):
     """
     Converts a 3D twist to its corresponding 4x4 matrix representation
@@ -155,10 +158,11 @@ def hat_3d(xi):
     omega = xi[3:]
     omega_hat = skew_3d(omega)
 
-    xi_hat_temp = np.concatenate([omega_hat, v])
+    xi_hat_temp = np.hstack([omega_hat, v])
     xi_hat = np.vstack([xi_hat_temp, np.array([0, 0, 0, 0]).reshape(1,4)])
 
     return xi_hat
+
 
 
 def homog_3d(xi, theta):
@@ -175,7 +179,8 @@ def homog_3d(xi, theta):
 
     # YOUR CODE HERE
     xi_hat = hat_3d(xi) * theta
-    return sp.linalg.expm(xi_hat)
+    return sp.expm(xi_hat)
+
 
 
 def prod_exp(xi, theta):
@@ -201,6 +206,7 @@ def prod_exp(xi, theta):
 
     return g
 
+    
 
 #---------------------------------TESTING CODE---------------------------------
 #-------------------------DO NOT MODIFY ANYTHING BELOW HERE--------------------
