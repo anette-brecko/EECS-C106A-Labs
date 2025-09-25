@@ -15,6 +15,7 @@ code by running "python kin_func_skeleton.py at the command line.
 """
 
 import numpy as np
+import scipy as sp
 
 np.set_printoptions(precision=4,suppress=True)
 
@@ -132,29 +133,7 @@ def rotation_3d(omega, theta):
 
     rot = np.zeros((3,3))
 
-    # x-axis
-    if (omega[0] == 1):
-        rot[0, 0] = 1
-        rot[1, 1] = np.cos(theta)
-        rot[1, 2] = -np.sin(theta)
-        rot[2, 1] = np.sin(theta)
-        rot[2, 2] = np.cos(theta)
-
-    # y-axis
-    elif (omega[1] == 1):
-        rot[1, 1] = 1
-        rot[0, 0] = np.cos(theta)
-        rot[0, 2] = np.sin(theta)
-        rot[2, 0] = -np.sin(theta)
-        rot[2, 2] = np.cos(theta)
-
-    # z-axis
-    elif (omega[2] == 1):
-        rot[2, 2] = 1
-        rot[0, 0] = np.cos(theta)
-        rot[1, 1] = np.cos(theta)
-        rot[0, 1] = -np.sin(theta)
-        rot[1, 0] = np.sin(theta)
+    # Use Rodrigues formula
 
     return rot
 
@@ -172,7 +151,7 @@ def hat_3d(xi):
     """
 
     # YOUR CODE HERE
-    v = xi[0:3]
+    v = (xi[0:3]).reshape(3,1)
     omega = xi[3:]
     omega_hat = skew_3d(omega)
 
