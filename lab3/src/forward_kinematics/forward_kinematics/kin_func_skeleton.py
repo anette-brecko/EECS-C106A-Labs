@@ -103,8 +103,17 @@ def skew_3d(omega):
     Returns:
     omega_hat - (3,3) ndarray: the corresponding skew symmetric matrix
     """
+    if not omega.shape == (3,):
+        raise TypeError('omega must be a 3d-vector')
 
     # YOUR CODE HERE
+    skew = np.zeros((3,3))
+    skew[0, 1] = -omega[2]
+    skew[1, 0] = omega[2]
+    skew[0, 2] = omega[1]
+    skew[2, 0] = -omega[1]
+    skew[2, 3] = -omega[0]
+    skew[3, 2] = omega[0]
 
 def rotation_3d(omega, theta):
     """
@@ -120,6 +129,36 @@ def rotation_3d(omega, theta):
 
     # YOUR CODE HERE
 
+    rot = np.zeros((3,3))
+
+    # x-axis
+    if (omega[0] == 1):
+        rot[0, 0] = 1
+        rot[1, 1] = np.cos(theta)
+        rot[1, 2] = -np.sin(theta)
+        rot[2, 1] = np.sin(theta)
+        rot[2, 2] = np.cos(theta)
+
+    # y-axis
+    elif (omega[1] == 1):
+        rot[1, 1] = 1
+        rot[0, 0] = np.cos(theta)
+        rot[0, 2] = np.sin(theta)
+        rot[2, 0] = -np.sin(theta)
+        rot[2, 2] = np.cos(theta)
+
+    # z-axis
+    elif (omega[2] == 1):
+        rot[2, 2] = 1
+        rot[0, 0] = np.cos(theta)
+        rot[1, 1] = np.cos(theta)
+        rot[0, 1] = -np.sin(theta)
+        rot[1, 0] = np.sin(theta)
+
+    return rot
+
+
+    
 def hat_3d(xi):
     """
     Converts a 3D twist to its corresponding 4x4 matrix representation
@@ -132,6 +171,15 @@ def hat_3d(xi):
     """
 
     # YOUR CODE HERE
+    omega = xi[0:3]
+    v = xi[3:]
+    omega_hat = skew_3d(omega)
+
+    xi_hat_temp = np.hstack([omega_hat, v])
+    xi_hat = np.vstack([xi_hat_temp, [0, 0, 0, 0]])
+
+    return xi_hat
+
 
 def homog_3d(xi, theta):
     """
@@ -146,6 +194,8 @@ def homog_3d(xi, theta):
     """
 
     # YOUR CODE HERE
+    xi_hat = hat_3d(xi) * theta
+    return sp.linalg.expm(xi_hat)
 
 
 def prod_exp(xi, theta):
@@ -162,6 +212,15 @@ def prod_exp(xi, theta):
     """
 
     # YOUR CODE HERE
+
+    n = theta.shape[0]
+    g = np.eye(4)
+
+    for i in range(n):
+        g = g @ homog_3d(xi[:, i], theta[i])
+
+    return g
+
 
 #---------------------------------TESTING CODE---------------------------------
 #-------------------------DO NOT MODIFY ANYTHING BELOW HERE--------------------
