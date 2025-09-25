@@ -112,8 +112,9 @@ def skew_3d(omega):
     skew[1, 0] = omega[2]
     skew[0, 2] = omega[1]
     skew[2, 0] = -omega[1]
-    skew[2, 3] = -omega[0]
-    skew[3, 2] = omega[0]
+    skew[1, 2] = -omega[0]
+    skew[2, 1] = omega[0]
+    return skew
 
 def rotation_3d(omega, theta):
     """
@@ -171,12 +172,12 @@ def hat_3d(xi):
     """
 
     # YOUR CODE HERE
-    omega = xi[0:3]
-    v = xi[3:]
+    v = xi[0:3]
+    omega = xi[3:]
     omega_hat = skew_3d(omega)
 
-    xi_hat_temp = np.hstack([omega_hat, v])
-    xi_hat = np.vstack([xi_hat_temp, [0, 0, 0, 0]])
+    xi_hat_temp = np.concatenate([omega_hat, v])
+    xi_hat = np.vstack([xi_hat_temp, np.array([0, 0, 0, 0]).reshape(1,4)])
 
     return xi_hat
 
